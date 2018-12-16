@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+
+  <contextName>catalog-web</contextName>
+
+  <springProperty scope="context" name="logRootLevel" source="logger_root_level"/>
+
+  <springProperty scope="context" name="logDbLevel" source="logger_db_level"/>
+
+  <!-- 定义日志文件 输入位置 -->
+  <property name="log_dir" value="${HOME}/logs/cultivated/${startTime}"/>
+
+  <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%level] [%thread] [%logger{50}] >>>
+        [catalog-web-console] json={} msg=%msg%n
+      </pattern>
+    </encoder>
+  </appender>
+
+  <!-- INFO级别日志 appender -->
+  <appender name="info" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <!-- 过滤器，只记录INFO级别的日志 -->
+    <file>${log_dir}/catalog-web-info.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <fileNamePattern>${log_dir}/%d{yyyy-MM-dd}-%i.cultivated-info.log</fileNamePattern>
+      <minIndex>1</minIndex>
+      <maxIndex>9</maxIndex>
+    </rollingPolicy>
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <maxFileSize>100MB</maxFileSize>
+    </triggeringPolicy>
+    <encoder>
+      <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%level] [%thread] [%logger{50}] >>> [catalog-web]
+        json={} msg=%msg%n
+      </pattern>
+    </encoder>
+  </appender>
+
+  <!-- db级别日志 appender -->
+  <appender name="logger_db" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <!-- 过滤器，只记录INFO级别的日志 -->
+    <file>${log_dir}/catalog-web-db.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <fileNamePattern>${log_dir}/%d{yyyy-MM-dd}-%i.cultivated-db.log</fileNamePattern>
+      <minIndex>1</minIndex>
+      <maxIndex>9</maxIndex>
+    </rollingPolicy>
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <maxFileSize>100MB</maxFileSize>
+    </triggeringPolicy>
+    <encoder>
+      <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%level] [%thread] [%logger{50}] >>> [catalog-web-db]
+        json={} msg=%msg%n
+      </pattern>
+    </encoder>
+  </appender>
+
+  <root level="${logRootLevel}">
+    <appender-ref ref="console"/>
+    <appender-ref ref="info"/>
+  </root>
+
+  <logger name="com.cultivated.app.persistence.mapper" level="${logDbLevel}" additivity="false">
+    <appender-ref ref="console"/>
+    <appender-ref ref="logger_db"/>
+  </logger>
+
+</configuration>
